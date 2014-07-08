@@ -1,0 +1,23 @@
+<?php
+$global = new \AngularComponent\Panel\Container();
+$global->addClass('row');
+
+$storage = new \AngularComponent\Storage\ExternalJsonStorage('mails','/contact/json', 'POST');
+
+$grid = new \AngularComponent\Grid\Grid($storage, null);
+$header = $grid->addColumn('Firstname', 'firstname');
+$header = $grid->addColumn('Lastname', 'lastname');
+$header = $grid->addColumn('Email', 'email'	);
+$header = $grid->addColumn('Valid', 'checked'		, 50);
+$header->setContent('<div class="glyphicon glyphicon-ok" style="color: green" ng-if="[[ row.checked==true ]]"></div>');
+$header = $grid->addColumn('Nb', 'Discuss'		, 50);
+$grid->addClass('col-md-6');
+
+
+$panel = new \AngularComponent\Panel\Container();
+$panel->addClass('col-md-6');
+
+$global->addChild($grid);
+$global->addChild($panel);
+
+\AngularComponent\Renderer::i()->show($global);

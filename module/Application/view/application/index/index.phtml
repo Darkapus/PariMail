@@ -1,0 +1,17 @@
+<?php
+use Zend\Http\Client;
+$url = "http://cloud.baschet.fr/index.php/apps/contacts/addressbooks/";
+$url = "http://cloud.baschet.fr/index.php/apps/contacts/addressbook/local/2/contacts";
+$url = "http://cloud.baschet.fr/remote.php/carddav/addressbooks/root/contacts";
+$url = "http://cloud.baschet.fr/ocs/v1.php/person/self";
+$url = "http://cloud.baschet.fr/index.php/search/ajax/search.php?query=benjamin";
+
+$client = new Client($url);
+
+// Performing a POST request
+$client->setAuth('benjamin@baschet.fr', 'zrxipuic');
+
+$response = $client->send();
+//echo nl2br(var_export($response, true));
+//var_dump($response);
+ var_dump(json_decode($response->getContent()));

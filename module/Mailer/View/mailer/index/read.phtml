@@ -1,0 +1,34 @@
+<?php
+$global = new \AngularComponent\Panel\Container();
+$global->setTopBar($tb = new \AngularComponent\Panel\StatusBar());
+$tb->addChild($menu = new \AngularComponent\Menu\Menu());
+//$tb->addClass('navbar-inverse');
+
+    foreach($this->files as $k=>$file){
+        $item = $menu->addItem('<div class="glyphicon glyphicon-paperclip"></div>', '/mailer/file/download/'.$this->folder.'/'.$this->id.'/'.$k);
+        $item->getLink()->addAttribute('target', '_blank');
+        $item->addAttribute('title',$file);
+    }
+
+$tb->addChild($menu = new \AngularComponent\Menu\Menu());
+$menu->right();
+	$i = $menu->addItem('<div class="glyphicon glyphicon-share-alt"></div>'); 
+	$i = $menu->addItem('<div class="glyphicon glyphicon-share-alt"></div><div class="glyphicon glyphicon-share-alt"></div>');
+	$i = $menu->addItem('<div class="glyphicon glyphicon-transfer"></div>'); 
+	$i = $menu->addItem('<div class="glyphicon glyphicon-trash"></div>'); 
+	
+	$i->getLink()->addAttribute('onclick', 'angular.element(\'#'.$i.'\').scope().load(\'/mailer/index/removemail\', \'POST\', {folder: \''.$this->folder.'\', id: '.$this->id.'})');
+
+\AngularComponent\Renderer::i()->show($global);
+?>
+
+<?php echo $this->content; ?><br/>
+<br/>
+<blockquote>
+<p><?php
+foreach($this->headers as $k=>$header) {
+    echo '<div class="row"><div class="col-md-4"><label >'.$header->getFieldName().':</label></div><div class="col-md-8"> <input type="text" class="form-control" value="'.htmlentities($header->getFieldValue()).'" /></div></div>';
+}
+?></p>
+<footer>Headers</footer>
+</blockquote>

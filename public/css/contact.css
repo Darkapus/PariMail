@@ -1,0 +1,54 @@
+.pm-profil-file{
+        position: relative;
+        border: 1px solid #e5e5e5;
+        padding: 1em;
+        background: #fff;
+        -moz-box-shadow: 0px 2px 0px #eee;
+        -webkit-box-shadow: 0px 2px 0px #eee;
+        box-shadow: 0px 2px 0px #eee;
+        border-radius: 5px;
+        height: 80px;
+        margin-bottom: 10px;
+        width: 400px;
+        cursor: pointer;
+        transition: all 0.5s;
+        color: #888;
+}
+
+.pm-profil-file:hover{
+        background:#e5e5e5;
+        border-color: #428bca;;
+}
+
+.pm-profil-image{
+        border-radius: 5px;
+        width: 70px;
+        height: 70px;
+        position: absolute;
+        border: 1px solid #e5e5e5;
+        background: #fff;
+        -moz-box-shadow: 0px 2px 0px #eee;
+        -webkit-box-shadow: 0px 2px 0px #eee;
+        box-shadow: 0px 2px 0px #eee;
+
+}
+
+.pm-profil-favor{
+        position: absolute;
+        width: 10px;
+        height: 10px;
+        right: 10px;
+        bottom: 10px;
+}
+.pm-profil-count{
+        position: absolute;
+        width: 10px;
+        height: 10px;
+        right: 30px;
+        bottom: 10px;
+}
+.pm-profil-content{
+        position: absolute;
+        left: 150px;
+}
+

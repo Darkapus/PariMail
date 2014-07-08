@@ -1,0 +1,42 @@
+<?php
+use AngularComponent\Form\Input;
+use AngularComponent\Form\Select;
+use AngularComponent\Core\Behavior;
+use AngularComponent\Storage\ExternalJsonStorage;
+$global = new \AngularComponent\Panel\Container();
+$global->addClass('row');
+
+$storage    = new ExternalJsonStorage('projects','/project/index/json', 'POST');
+$status     = new ExternalJsonStorage('status','/project/index/jsonstatus', 'POST');
+
+$grid = new \AngularComponent\Grid\Grid($storage, null);
+$grid->getController()->addChild(new Behavior('$scope.status={}'));
+$grid->getController()->addChild(new Behavior('$scope.status.data=[]'));
+$grid->getController()->addChild($status);
+
+$header = $grid->addColumn('Label', 'label',300);
+$header ->setEditElement($i = new Input('', 'label', 'text', null, 'row.label' ));
+$header = $grid->addColumn('Status', 'status.label', 150);
+$header ->setEditElement($i = new Select('', 'status', null, 'status.data', 'id', 'label', 'row.status.id' ));
+$header = $grid->addColumn('Priority', 'priority', 50);
+$header ->setEditElement($i = new Input('', 'priority', 'text', null, 'row.priority' ));
+$header = $grid->addColumn('Length', 'length', 50);
+$header ->setEditElement($i = new Input('', 'length', 'text', null, 'row.length' ));
+$header = $grid->addColumn('Percent', 'percent', 50);
+$header ->setEditElement($i = new Input('', 'percent', 'text', null, 'row.percent' ));
+$header = $grid->addColumn('Note', 'note');
+$header ->setEditElement($i = new Input('', 'note', 'text', null, 'row.note' ));
+$grid->addClass('col-md-12');
+
+/*
+$panel = new \AngularComponent\Panel\Container();
+$panel->addClass('col-md-6');
+*/
+$global->addChild($grid);
+//$global->addChild($panel);
+$grid->addChild($bDelete  = new \AngularComponent\Form\Button('Delete'));
+$grid->addChild($bAdd     = new \AngularComponent\Form\Button('Add'));
+
+
+$bAdd->addAttribute('ng-click', 'load(\'/project/index/insert\', \'POST\', {})');
+\AngularComponent\Renderer::i()->show($global);
