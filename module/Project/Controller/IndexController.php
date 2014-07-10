@@ -40,7 +40,7 @@ class IndexController extends AbstractActionController{
             echo \Core\Model\Entity\PmProject::jsonFindAll();
         }
         
-        exit;
+        return false;
     }
     public function insertAction(){
         header('Content-Type: application/json');
@@ -49,7 +49,7 @@ class IndexController extends AbstractActionController{
         $project->persist();
         $project->save();
         echo '{"success":true, "id":'.$project->getId().'}';
-        exit;
+        return false;
     }
     
     protected $data;

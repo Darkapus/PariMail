@@ -1,6 +1,7 @@
 <?php
 namespace Core\Model\Db;
-
+use Core\Model\Db\AbstractDb;
+use Core\Model\Db\ParimailDb;
 /**
  * classe de connexion Ã  la bdd CIS
  * @author bbaschet
@@ -34,13 +35,10 @@ class ParimailDb extends AbstractDb
 		$isDevMode = true;
 		parent::__construct('root', 'zrxipuic', 'parimail', '127.0.0.1', $isDevMode, array(1002=>'SET NAMES utf8'));
 		
-		//$this->addPaths(array(__DIR__.'/../Entity/'));
-        $this->addPaths(array(__DIR__.'/../Entity/'));
-		//$this->addPaths(array(__DIR__.'/../../../../../Stock/Model/Entity/'));
+		$this->addPaths(array(__DIR__.'/../Entity/'));
 		
 		$platform = $this->getManager()->getConnection()->getDatabasePlatform();
 		$platform->registerDoctrineTypeMapping('enum', 'string');
 		$platform->registerDoctrineTypeMapping('set', 'string');
-//$this->getManager()->getProxyFactory()->generateProxyClasses($this->getManager()->getMetadataFactory()->getAllMetadata());
 	}
 }

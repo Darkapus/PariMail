@@ -35,9 +35,7 @@ class FileController extends AbstractActionController
 		//header('Content-Transfer-Encoding: binary');
 		echo(base64_decode($file->getContent()));
 		//var_dump($file->getHeaders());
-		exit;
-		
-		return $viewModel;
+		return false;
     }
     protected $data;
 	public function getRequestData(){

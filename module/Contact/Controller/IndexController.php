@@ -21,7 +21,7 @@ class IndexController extends AbstractActionController
     {
         
         $viewModel  = new ViewModel();
-		//$viewModel->setTerminal(true);
+		
 		return $viewModel;
     }
     public function searchAction(){
@@ -35,16 +35,9 @@ class IndexController extends AbstractActionController
         $client->setAuth('benjamin@baschet.fr', 'zrxipuic');
         
         $response = $client->send();
-        //echo nl2br(var_export($response, true));
-        //var_dump($response);
-         //var_dump(json_decode$response->getContent()));
         echo $response->getContent();
         
-        exit;
-        $rows = \Core\Model\Entity\PmContact::createQuery('u.email like \'%'.$this->getRequestData()->query.'%\'')->getQuery()->getResult();
-        echo \Core\Model\Entity\PmContact::makeJsonFor($rows);
-        
-        exit;
+        return false;
     }
     public function jsonAction(){
         header('Content-Type: application/json');
@@ -61,7 +54,7 @@ class IndexController extends AbstractActionController
             echo \Core\Model\Entity\PmContact::jsonFindAll();
         }
         
-        exit;
+        return false;
     }
     public function insertAction(){
         
@@ -76,7 +69,7 @@ class IndexController extends AbstractActionController
             }
             
         }
-        exit;
+        return false;
     }
     protected $data;
 	public function getRequestData(){
@@ -88,7 +81,7 @@ class IndexController extends AbstractActionController
     public function createmodelAction(){
         // nouveau driver pour ne pas avoir de conflit de lecture
 		$driver = new \Doctrine\ORM\Mapping\Driver\DatabaseDriver(\Core\Model\Db\ParimailDb::i()->getManager()->getConnection()->getSchemaManager());
-		// dÃ©finition du namespace
+		// definition du namespace
 		$driver->setNamespace('Core\\Model\\Entity\\');
 		
 		\Core\Model\Db\ParimailDb::i()->getManager()->getConfiguration()->setMetadataDriverImpl($driver);
@@ -98,24 +91,20 @@ class IndexController extends AbstractActionController
 		
 		$metadata = $cmf->getAllMetadata();
 		
-		//$meta->setInheritanceType("SINGLE_TABLE");
 		foreach($metadata as $meta){
-			//$meta->isMappedSuperclass = true;
 			$meta->setInheritanceType(ClassMetadataInfo::INHERITANCE_TYPE_NONE);
-			//$meta->setInheritanceType(ClassMetadataInfo::INHERITANCE_TYPE_NONE);
 		}
 		$entityGenerator = new \Doctrine\ORM\Tools\EntityGenerator();
 		
 		$entityGenerator->setGenerateAnnotations(true);
 		$entityGenerator->setGenerateStubMethods(true);
 		$entityGenerator->setRegenerateEntityIfExists(true);
-		//$entityGenerator->setUpdateEntityIfExists(true);
 		
 		$entityGenerator->setClassToExtend('Core\Model\Entity\Object');
 		$entityGenerator->setFieldVisibility(EntityGenerator::FIELD_VISIBLE_PROTECTED);
 		// repertoire dans lequel on stock les class
-                echo ('try to generate to : '.__DIR__.'/../..'.'<br>');
+        echo ('try to generate to : '.__DIR__.'/../..'.'<br>');
 		$entityGenerator->generate($metadata, __DIR__.'/../..');
-		exit;
+		return false;
     }
 }

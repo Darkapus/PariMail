@@ -14,8 +14,6 @@ use Doctrine\ORM\Mapping\ClassMetadataInfo;
 
 use Doctrine\ORM\Mapping\Builder\ClassMetadataBuilder;
 
-use Authentificator\Model\User\Me;
-
 use Doctrine\DBAL\DBALException;
 
 /**
@@ -41,13 +39,8 @@ abstract class Object
 	 */
 	public function save(){
 		// sauvegarde
-		try {
-			self::getManager()->flush($this);
-		}
-		catch(DBALException $e){
-			
-			error_log('Une erreur est survenue lors de la sauvegarde.'.$e->getMessage());
-		}
+		self::getManager()->flush($this);
+		
 		return $this;
 	}
 	/**
@@ -56,7 +49,6 @@ abstract class Object
 	 */
 	public function delete(){
 		self::getManager()->remove($this);
-		//self::getManager()->flush($this);
 		self::getManager()->flush();
 		
 		return false;
@@ -113,23 +105,17 @@ abstract class Object
 		$query = self::getManager()->getRepository(get_called_class())->createQueryBuilder($alias);
 		$where  && $query->andWhere($where);
 		
-		//getenv('APPLICATION_ENV')=='development'  &&  error_log(var_export($orders, true));
 		if($orders){
 			foreach($orders as $sort=>$order){
 				$query->addOrderBy($sort,$order);
 			}
 		}
-		//error_log(var_export(self::getAssociations(), true));
 		foreach(self::getAssociations() as $k=>$association){
 			$query->leftJoin($alias.'.'.$k, $k);
-			$query->addSelect($k); // ajout de la table dans le select sinon plein de notices
+			$query->addSelect($k);
 		}
 
-        //$query->addSelect('catalog.parent');
-
-		//getenv('APPLICATION_ENV')=='development'  &&  error_log('exec req on '.get_called_class());
-		//getenv('APPLICATION_ENV')=='development'  &&  error_log($query->getQuery()->getSQL());
-		
+        
 		return $query;
 	}
 	/**
@@ -172,13 +158,11 @@ abstract class Object
 		
 		foreach($datas as $k=>$data){
 			$datas[$k] = $data->getDataObject($properties, $recursive);
-			//error_log(json_encode($data->getDataObject($properties)));
 		}
 		if(is_null($nb)){
 			$nb = count($datas);
 		}
 		return json_encode($datas);
-		return json_encode(array('totalCount'=>$nb,'items'=>$datas));
 	}
 	/**
 	 * return les propriété d'un objet
@@ -249,7 +233,6 @@ abstract class Object
 		$entityGenerator->setUpdateEntityIfExists(true);
 		$entityGenerator->setFieldVisibility(EntityGenerator::FIELD_VISIBLE_PROTECTED);
 		
-		// repertoire dans lequel on stock les class
 		if(is_null($meta)){
 			$entityGenerator->generate(array(self::getMetaStructure()), $dir);
 		}
@@ -257,7 +240,7 @@ abstract class Object
 			$entityGenerator->generate(array($meta), $dir);
 		}
 		
-		//return $this;
+		return $this;
 	} 
 	public static function getSqlDiff(){
 		$schema = new SchemaTool(self::getManager());
@@ -277,33 +260,22 @@ abstract class Object
 				$res->execute();
 			}
 			catch(\Exception $e){
-				// on ne génère pas d'erreur à ce niveau pour le moment.
+				
 			}
 		}
-		//return $this;
+		
 	}
 	public static function getAssociations(){
 		return self::getMetaStructure()->getAssociationMappings();
 	}
 	public static function getJsonStructure(){
 		$mappings = array();
-		//var_dump(self::getMetaStructure()->getAssociationMappings());
-		//var_dump(self::getMetaStructure()->getAssociationMapping('action'));
-		//$map = self::getMetaStructure()->getAssociationMapping('action');
-		//self::getMetaStructure()
-		//var_dump($map['joinColumnFieldNames']['id_action']);
-		//exit;
 		foreach(self::getMetaStructure()->fieldMappings as $mapping){
 			$mappings[] = $mapping;
 		}
-		/*
-		foreach(self::getMetaStructure()->associationMappings as $association){
-			$mappings[] = $association;
-		}*/
 		return json_encode($mappings);
 	}
 	public function handle($data){
-		// si le parametre poussé en handle est une association alors, on cherche en fonction de id et on pousse la daa
 		foreach($this->getAssociations() as $property=>$association){
 			if(array_key_exists($property, $data)){
 				$method = 'set'.ucfirst($property);
@@ -321,11 +293,9 @@ abstract class Object
 		}
 		foreach($this->getMetaStructure()->fieldMappings as  $field){
 			$property = $field['fieldName'];
-			//error_log($property.' : '.$data[$property]);
 			if(array_key_exists($property, $data)){
 				$method = 'set'.ucfirst($property);
 				if(method_exists($this, $method)){
-					// les transformations
 					if($data[$property]){
 						switch($field['type']){
 							case 'date':
@@ -333,9 +303,8 @@ abstract class Object
 								$data[$property] = new \DateTime($data[$property]);
 								break;
 							case 'boolean':
-							//	error_log('value ==== '.$data[$property]);
-								
 								$data[$property] = ($data[$property]=='true')?true:false;
+								break;
 						}
 					}
 					else{ 
@@ -358,7 +327,6 @@ abstract class Object
 				}
 			}
 		}
-		// sauvegarde
 		$this->save();
 		return $this;
 	}

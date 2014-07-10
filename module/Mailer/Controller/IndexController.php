@@ -34,7 +34,7 @@ class IndexController extends AbstractActionController
         }
         
         echo json_encode($object);
-        exit;
+        return false;
     }
     public function indexAction()
     {
@@ -54,7 +54,7 @@ class IndexController extends AbstractActionController
 			\Mailer\Smtp::i()->sendmail(\Mailer\Config::SMTP_FROM, 'benjamin@baschet.fr', 'Email test '.$start->format('Y-m-d h:i:s'), $when->format('Y-m-d h:i:s'));
 		}
 		echo 'ok';
-		exit;
+		return false;
 	}
 	public function foldersAction(){
 
@@ -68,7 +68,7 @@ class IndexController extends AbstractActionController
 		$message = \Mailer\Smtp::i()->sendmail(\Mailer\Config::SMTP_FROM, $this->getRequestData()->message->contacts, $this->getRequestData()->message->subject, $this->getRequestData()->message->body);
 		
 		\Mailer\Imap::i()->appendMessage($message->toString(), 'Sent');
-		exit;
+		return false;
 	}
 	public function readAction(){
 		\Mailer\Imap::i()->selectFolder($this->getRequestData()->folder);
@@ -105,7 +105,7 @@ class IndexController extends AbstractActionController
 	    \Mailer\Imap::i()->selectFolder($this->getRequestData()->folder);
 	    \Mailer\Imap::i()->removeMessage($this->getRequestData()->id);
 	    echo '{"success":true}';
-	    exit;
+	    return false;
 	}
 	public function movemailAction(){
 	    header('Content-Type: application/json');
@@ -131,7 +131,7 @@ class IndexController extends AbstractActionController
 	        \Mailer\Smtp::i()->sendmail(\Mailer\Config::SMTP_FROM, $contacts, $subject, $content);
 	    }
 	    echo '{"success":true}';
-		exit;
+		return false;
 	}
 	
 	protected $data;
