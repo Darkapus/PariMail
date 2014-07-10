@@ -1,54 +1,37 @@
  	<?php
 	use AngularComponent\Core\Behavior;
-	
 	use AngularComponent\Panel\Window;
 	use AngularComponent\Panel\Container;
 	use AngularComponent\Panel\TabPanel;
 	use AngularComponent\Panel\StatusBar;
 	use AngularComponent\Panel\Tab;
-	
 	use AngularComponent\Grid\Grid;
-	
 	use AngularComponent\Storage\ExternalJsonStorage;
 	use AngularComponent\Storage\JsonStorage;
-	
 	use AngularComponent\Menu\Menu;
 	use AngularComponent\Menu\Item;
-	
 	/*******************************************************************/
 	// la vue principale
 	/*******************************************************************/
 	$global = new Container();
-	
 	$global->addClass('row');
 	$global_controller = $global->getController();
-	
 	/*******************************************************************/
 	// LA FENETRE DE COMPOSITION DE MAIL
 	/*******************************************************************/
 	$global->addChild($window = new Window("Compose"));
-	
-	
 	/*******************************************************************/
 	// LA NAVIGATION 
 	/*******************************************************************/
 	$global->setTopBar($tb = new StatusBar());
 	$tb->addClass('navbar-static-top navbar-inverse');
-	
-	
-	
-	
 	$tb->addChild($menu = new Menu());
-	
 	$refresh 	= $menu->addItem('<div class="glyphicon glyphicon-refresh"></div>');
 	$it 		= $menu->addItem('<div class="glyphicon glyphicon-folder-close"></div> Folders  <b class="caret"></b>');
 	$it1 		= $menu->addItem('<div class="glyphicon glyphicon-pencil"></div> Compose <b class="caret"></b>');
 	$it1->addChild($emailsend = new Item('<div class="glyphicon glyphicon-envelope"></div> Mail'));
     $it1->addChild(new Item('<div class="glyphicon glyphicon-dashboard"></div> Campaign'));
-	
 	$emailsend->setToggleWindow($window);
-	
-	
 	$modules = $menu->addItem('<div class="glyphicon glyphicon-cloud"></div> OwnCloud <b class="caret"></b>');
 	$modules->addChild(new Item('<div class="glyphicon glyphicon-user"></div> Contacts', '/contact'));
 	$modules->addChild(new Item('<div class="glyphicon glyphicon-heart"></div> Groups', '/group'));
@@ -61,8 +44,7 @@
 	$folders            = new ExternalJsonStorage('folders','/mailer/index/folders');
 	$storage_contact    = new ExternalJsonStorage('contacts','/contact/json', 'POST');
 	$storage_contacts 	= new JsonStorage('contacts', '{data:[]}');
-    
-	/*******************************************************************/
+    /*******************************************************************/
 	// LES CONTACTS 
 	/*******************************************************************/
 	$grid               = new Grid($storage_contact, null);
@@ -76,31 +58,23 @@
 	$header ->setEditElement($i = new \AngularComponent\Form\Input('', 'email', 'text', null, 'row.email'));
 	$header             = $grid->addColumn('Valid'		, 'checked'		, 50);
 	$header             = $grid->addColumn('Nb'			, 'Discuss'		, 50);
-	
 	$header				->setContent('<div class="glyphicon glyphicon-ok" style="color: green" ng-if="row.checked==true"></div>');
 	$grid				->setDropStyle('bg-success');
 	$grid				->addClass('col-md-12');
-	
 	/*******************************************************************/
 	// LES INFOS DU CONTACT 
 	/*******************************************************************/
 	$panel 				= new Container();
-	
 	$panel				->addClass('col-md-6');
-	
 	/*******************************************************************/
 	// LES ONGLETS DE LA VUE GENERALE
 	/*******************************************************************/
 	$tabpanel 			= new TabPanel();
-	
 	$tabpanel			->addClass('col-md-8');
 	$tabpanel			->addChild($tab_mail = new Tab('Reader'));
 	$tabpanel			->addChild($tab_contact = new Tab('Contacts'));
-	
 	// ajout dans le tab le contact
 	$tab_contact		->addChild($grid);
-	//$tab_contact		->addChild($panel);
-    
 	$global_controller	->addChild(new Behavior('$scope.folders={}'));
 	$global_controller	->addChild(new Behavior('$scope.folders.data={}'));
 	$global_controller	->addChild($folders);
@@ -111,7 +85,6 @@
     	$item->addAttribute('dropStyle', "bg-success");
     	$item->addAttribute('dragStyle', "bg-success");
     	$item->addAttribute('ng-class','{\'dropdown-submenu\': folder.children.length>0}');
-    	//$item->addAttribute('ng-disabled', 'folder.children.length>0');
     	$item->addChild($child = new Item('[[ child.label ]]'));
 	        $child->addAttribute('ng-repeat', 'child in folder.children');
 	        $child->addAttribute('drop', "child");
@@ -120,49 +93,32 @@
 	        $child->addAttribute('dragStyle', "bg-success");
 	$it->addChild($separate = new Item('')); $separate->addClass('divider');
 	$it->addChild($edit_folder = new Item('<div class="glyphicon glyphicon-pencil"></div> Edit Folders', '/folder'));$edit_folder->getLink()->addClass('btn-info');
-	
 	/*******************************************************************/
 	// la grille
 	/*******************************************************************/
 	$grid 	= new Grid($storage, null);
 	$grid		->getController()->addChild(new Behavior('$scope.currentFolder="INBOX"'));
-	
 	$item		->getLink()->addAttribute('ng-click', 	'getScope(\''.$grid.'\').currentFolder=folder.name;'.$grid->bReLoad('{\'folder\':folder.name}')->getContent());
 	$child		->getLink()->addAttribute('ng-click', 	'getScope(\''.$grid.'\').currentFolder=child.name;'.$grid->bReLoad('{\'folder\':child.name}')->getContent());
-	
 	$refresh	->addAttribute('ng-click', 	$grid->bReLoad('{\'folder\':getScope(\''.$grid.'\').currentFolder}')->getContent());
-	
 	$grid		->getController()->addChild(new Behavior('$scope.mails.sort.column=\'date\''));
 	$grid		->getController()->addChild(new Behavior('$scope.mails.sort.descending=true'));
 	$grid		->addClass('col-md-4');
-	
 	$header = $grid->addColumn('', 'file'		    , 50);
 	$header		->setContent('<div class="glyphicon glyphicon-paperclip" ng-if="row.file==true"></div>');
-	
 	$header = $grid->addColumn('From', 'from'		, 300);
 	$header		->setContent('<b>[[ row.from ]]</b> <br> [[ row.subject ]]'); // redefinition de la template
-	
 	$grid		->addColumn('Date', 'date'		, 150);
 	$grid		->addClass('shadow');
 	$grid		->setDragStyle('bg-success');
-	
 	// définition d'une classe en fonction de la donnée dans row
 	$grid->setRowClass("'bg-info': row.seen=='unread'");
-	
-	
-	
-	
-	
-	
 	/*******************************************************************/
 	// le panel de lecture des mails
 	/*******************************************************************/
 	$reader = new Container();
 	$reader->addClass('col-md-12');
-	
-	
 	$global_controller->addChild(new Behavior('$scope.message={}')); // definition du message courant
-	
 	// definition de la barre de statut
 	$window->addButton($bReset = new \AngularComponent\Form\Button(''));
 	$bReset->addAttribute('ng-click', 'message={};'); // initialisation du message au click sur le bouton
@@ -174,19 +130,14 @@
 	$window->addButton($bSent = new \AngularComponent\Form\Button(''));
 	$bSent->setToolTip('Send');
 	$bSent->addClass('btn-primary glyphicon glyphicon-send');
-	
-	
 	$window->addChild($left = new Container());
 	$left->addClass('col-md-4');
 	$left->addChild($contacts = new Grid($storage_contacts, null, $window->getController()));
 	$header = $contacts->addColumn('', 'type');
 	$header->setContent('<div class="glyphicon" ng-class="{\'glyphicon-user\':row.type==0, \'glyphicon-eye-open\':row.type==1, \'glyphicon-eye-close\':row.type==2}"></div>');
-	
 	$contacts->addColumn('Email', 'email', 150);
-	
 	$header = $contacts->addColumn('', 'cross');
 	$header->setContent('<button type="button" class="close" ng-click="deleteContact(row)">×</button>');
-	
 	// gestion des contacts to/cc/bcc
 	$contacts->getController()->addChild(new Behavior('$scope.contacts.sort.column=\'email\''));
 	$contacts->getController()->addChild(new Behavior('$scope.changeType = function(row){row.type = row.type+1; if(row.type==3){row.type=0;} }'));
@@ -196,35 +147,25 @@
 	$contacts->setSelectable(false);
 	$window->addChild($form = new \AngularComponent\Panel\Form());
 	$form->addClass('col-md-8');
-	
 	$form->addChild($i = new \AngularComponent\Form\Input('', 'to', 'text', null, 'message.to'));
-	
 	$i->addAttribute('ng-enter', 'addContact(message.to)');
 	$i->addAttribute('placeholder', 'To');
 	$i->addAttribute('typeahead', 'contact for contact in getContacts($viewValue)');
 	$i->addAttribute('autocomplete', "off");
-	//	$i->addAttribute('typeahead-loading', "loadingLocations");
-	//$window->getController()->addChild(new Behavior('$scope.getContacts = function(value){return $http.post(\'/contact/search\', { query:value}).then(function(res){ var addresses = [];angular.forEach(res.data, function(item){addresses.push(\'"\'+item.fullname+\'" <\'+item.email+\'>\');});return addresses;}); }'));
 	$window->getController()->addChild(new Behavior('$scope.getContacts = function(value){return $http.post(\'/contact/search\', { query:value}).then(function(res){ var addresses = [];angular.forEach(res.data, function(item){if(item.name) addresses.push(\'"\'+item.id+\'" <\'+item.name+\'>\');});return addresses;}); }'));
-	
 	$window->getController()->addChild(new Behavior('$scope.addContact  = function(email){ $http.post(\'/contact/insert\', {data:email})  ;angular.element(\'#'.$contacts.'\').scope().contacts.data.push({"email":email, "type":0, "objectType":"contact"}); angular.element(\'#'.$contacts.'\').scope().message.to=\'\'}'));
-	//$i->autocomplete('{source:["hello"]}');
-	
 	$form->addChild($i = new \AngularComponent\Form\Input('', 'subject', 'text', null, 'message.subject'));$i->addAttribute('placeholder', 'Subject');
 	$form->addChild($editor = new \AngularComponent\Form\Textarea('', 'body', null, 'message.body'));
-	//$bAnswer->addAttribute('onclick', 'CKEDITOR.instances.'.$editor.'.setData($(\'#'.$reader.'_body\').html())');
 	$window->getController()->addChild(new Behavior('$scope.GetCKData = function(){return CKEDITOR.instances.'.$editor.'.getData();}'));
 	$bSent->addAttribute('ng-click', 'message.body = GetCKData(); message.contacts = getScope(\''.$contacts.'\').contacts.data ;load(\'/mailer/index/sendmail\', \'POST\', {\'message\': message})');
 	$editor->addClass('ckeditor');
 	$global_controller->addChild(new Behavior('$scope.compose=true')); // compose initialisé à true
-	
 	/*******************************************************************/
 	// on ajoute les 2 panels à la vue principale
 	/*******************************************************************/
 	$global->addChild($grid);
 	$global->addChild($tabpanel);
 	$tab_mail->addChild($reader);
-	
 	/*******************************************************************/
 	// interactions globales en fonction des types d'objet
 	/*******************************************************************/
@@ -248,48 +189,11 @@
 		else if(dropped.email){ // then it is a contact
 			
 		}
-		
 	})'));
-	
-	
 	/*******************************************************************/
 	// les évènements
 	/*******************************************************************/
 	$grid->onRowClick(new Behavior($grid.'.load(\'/mailer/index/read\',\''.$reader.'\', \'POST\', {id: row.id, folder: row.folder})'));
-	
 	\AngularComponent\Renderer::i()->show($global);
-	
 	?>
-	<script>
-    function launchRefresh(){
-	    $('#<?php echo $refresh; ?>').click();
-    }
-    setInterval("launchRefresh()",60000);
-	CKEDITOR.replace( '<?php echo $editor; ?>', {
-				uiColor: '#e3e4e6',
-				toolbar: [
-					[ 'Source', 'Preview', 'Maximize', 'ShowBlocks' ],
-					[ 'Bold', 'Italic', 'Underline', 'Strike' ],
-					['Font', 'FontSize', 'TextColor', 'BGColor'],
-					['Table', 'Image'],
-					/*{ name: 'document', groups: [ 'mode', 'document', 'doctools' ], items: [ 'Source', '-', 'Save', 'NewPage', 'Preview', 'Print', '-', 'Templates' ] },*/
-					/*{ name: 'clipboard', groups: [ 'clipboard', 'undo' ], items: [ 'Cut', 'Copy', 'Paste', 'PasteText', 'PasteFromWord', '-', 'Undo', 'Redo' ] },*/
-					/*{ name: 'editing', groups: [ 'find', 'selection', 'spellchecker' ], items: [ 'Find', 'Replace', '-', 'SelectAll', '-', 'Scayt' ] },*/
-					/*{ name: 'forms', items: [ 'Form', 'Checkbox', 'Radio', 'TextField', 'Textarea', 'Select', 'Button', 'ImageButton', 'HiddenField' ] },*/
-					'/',
-					/*{ name: 'basicstyles', groups: [ 'basicstyles', 'cleanup' ], items: [ 'Bold', 'Italic', 'Underline', 'Strike', 'Subscript', 'Superscript', '-', 'RemoveFormat' ] },*/
-					{ name: 'paragraph', groups: [ 'list', 'indent', 'blocks', 'align', 'bidi' ], items: [ 'NumberedList', 'BulletedList', '-', 'Outdent', 'Indent', '-', 'Blockquote', 'CreateDiv', '-', 'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock', '-', 'BidiLtr', 'BidiRtl', 'Language' ] },
-					{ name: 'links', items: [ 'Link', 'Unlink', 'Anchor' ] },
-					/*{ name: 'insert', items: [ 'Image', 'Flash', 'Table', 'HorizontalRule', 'Smiley', 'SpecialChar', 'PageBreak', 'Iframe' ] },*/
-					/*'/',*/
-					/*{ name: 'styles', items: [ 'Styles', 'Format', 'Font', 'FontSize' ] },*/
-					/*{ name: 'colors', items: [ 'TextColor', 'BGColor' ] },*/
-					/*{ name: 'tools', items: [ 'Maximize', 'ShowBlocks' ] },*/
-					/*{ name: 'others', items: [ '-' ] },*/
-					/*{ name: 'about', items: [ 'About' ] }*/
-				],
-				height: '390px',
-			
-			});
-
-	</script>
+	<script>function launchRefresh(){$('#<?php echo $refresh; ?>').click();}setInterval("launchRefresh()",60000);CKEDITOR.replace( '<?php echo $editor; ?>', {uiColor: '#e3e4e6',toolbar: [[ 'Source', 'Preview', 'Maximize', 'ShowBlocks' ],[ 'Bold', 'Italic', 'Underline', 'Strike' ],['Font', 'FontSize', 'TextColor', 'BGColor'],['Table', 'Image'],'/',{ name: 'paragraph', groups: [ 'list', 'indent', 'blocks', 'align', 'bidi' ], items: [ 'NumberedList', 'BulletedList', '-', 'Outdent', 'Indent', '-', 'Blockquote', 'CreateDiv', '-', 'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock', '-', 'BidiLtr', 'BidiRtl', 'Language' ] },{ name: 'links', items: [ 'Link', 'Unlink', 'Anchor' ] },],height: '390px'});</script>
