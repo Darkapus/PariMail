@@ -17,6 +17,13 @@ use Zend\Http\Client;
 
 class IndexController extends AbstractActionController
 {
+    private $view;
+    public function getView(){
+        if(is_null($this->view)){
+            $this->view = new ViewModel();
+        }
+        return $this->view;
+    }
     public function indexAction()
     {
         
@@ -36,8 +43,7 @@ class IndexController extends AbstractActionController
         
         $response = $client->send();
         echo $response->getContent();
-        
-        return false;
+        return $this->response;
     }
     public function jsonAction(){
         header('Content-Type: application/json');
@@ -53,11 +59,10 @@ class IndexController extends AbstractActionController
         else{
             echo \Core\Model\Entity\PmContact::jsonFindAll();
         }
-        
-        return false;
+        return $this->response;
     }
     public function insertAction(){
-        
+        $this->getView()->setTerminal(true);
         preg_match("/[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]{2,}[.][a-zA-Z]{2,4}/", $this->getRequestData()->data, $output_array);
         if($output_array){
             $email = $output_array[0];
@@ -69,7 +74,7 @@ class IndexController extends AbstractActionController
             }
             
         }
-        return false;
+        return $this->getView();
     }
     protected $data;
 	public function getRequestData(){
@@ -105,6 +110,6 @@ class IndexController extends AbstractActionController
 		// repertoire dans lequel on stock les class
         echo ('try to generate to : '.__DIR__.'/../..'.'<br>');
 		$entityGenerator->generate($metadata, __DIR__.'/../..');
-		return false;
+		return $this->response;
     }
 }

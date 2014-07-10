@@ -13,13 +13,20 @@ use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\ViewModel;
 use Core\Model\Entity\PmProject;
 class IndexController extends AbstractActionController{
+    private $view;
+    public function getView(){
+        if(is_null($this->view)){
+            $this->view = new ViewModel();
+        }
+        return $this->view;
+    }
     public function indexAction(){
         return new ViewModel();
     }
     public function jsonstatusAction(){
         header('Content-Type: application/json');
         echo \Core\Model\Entity\PmProjectStatus::jsonFindAll();
-        exit;
+        return $this->response;
     }
     public function jsonAction(){
         header('Content-Type: application/json');
@@ -39,17 +46,15 @@ class IndexController extends AbstractActionController{
         else{
             echo \Core\Model\Entity\PmProject::jsonFindAll();
         }
-        
-        return false;
+        return $this->response;
     }
     public function insertAction(){
         header('Content-Type: application/json');
         $project = new \Core\Model\Entity\PmProject();
-        
         $project->persist();
         $project->save();
         echo '{"success":true, "id":'.$project->getId().'}';
-        return false;
+        return $this->response;
     }
     
     protected $data;

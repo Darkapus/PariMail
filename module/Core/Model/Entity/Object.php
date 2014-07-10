@@ -14,7 +14,6 @@ use Doctrine\ORM\Mapping\ClassMetadataInfo;
 
 use Doctrine\ORM\Mapping\Builder\ClassMetadataBuilder;
 
-use Doctrine\DBAL\DBALException;
 
 /**
  * etendre de cet objet pour avoir un panel de fonctions utiles pour les objets doctrine 

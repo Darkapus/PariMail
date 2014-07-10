@@ -16,6 +16,13 @@ define('SMTP_FROM' , 'root@waste.email');
 
 class IndexController extends AbstractActionController
 {
+    private $view;
+    public function getView(){
+        if(is_null($this->view)){
+            $this->view = new ViewModel();
+        }
+        return $this->view;
+    }
     public function connectAction(){
         header('Content-Type: application/json');
         $object = new \stdClass();
@@ -34,7 +41,7 @@ class IndexController extends AbstractActionController
         }
         
         echo json_encode($object);
-        return false;
+        return $this->response;
     }
     public function indexAction()
     {
@@ -45,7 +52,7 @@ class IndexController extends AbstractActionController
 		header('Content-Type: application/json');
         echo json_encode(\Mailer\Imap::i()->getMails($this->getRequestData()->folder));
         
-        exit;
+        return $this->response;
 	}
 	public function sendmaxAction(){
 		$start = new \DateTime();
@@ -54,21 +61,20 @@ class IndexController extends AbstractActionController
 			\Mailer\Smtp::i()->sendmail(\Mailer\Config::SMTP_FROM, 'benjamin@baschet.fr', 'Email test '.$start->format('Y-m-d h:i:s'), $when->format('Y-m-d h:i:s'));
 		}
 		echo 'ok';
-		return false;
+		
+		return $this->response;
 	}
 	public function foldersAction(){
-
-		header('Content-Type: application/json');
+        header('Content-Type: application/json');
 		
 		echo json_encode(\Mailer\Imap::i()->getTreeFolders());
-		exit;
+		return $this->response;
 	}
 	public function sendmailAction(){
-		
 		$message = \Mailer\Smtp::i()->sendmail(\Mailer\Config::SMTP_FROM, $this->getRequestData()->message->contacts, $this->getRequestData()->message->subject, $this->getRequestData()->message->body);
 		
 		\Mailer\Imap::i()->appendMessage($message->toString(), 'Sent');
-		return false;
+		return $this->response;
 	}
 	public function readAction(){
 		\Mailer\Imap::i()->selectFolder($this->getRequestData()->folder);
@@ -92,20 +98,20 @@ class IndexController extends AbstractActionController
 		$viewModel  = new ViewModel(array('id'=>$this->getRequestData()->id,'folder'=>$this->getRequestData()->folder,'content'=>$content, 'headers'=>$headers, 'files'=>$files));
 		$viewModel->setTerminal(true);
 		
-		
 		return $viewModel;
 	}
 	public function readmailAction(){
 	    \Mailer\Imap::i()->selectFolder($this->getRequestData()->folder);
 		echo \Mailer\Imap::i()->getFormatedMessage($this->getRequestData()->id)->getContent();
-		exit;
+		$this->getView()->setNoRender();
+		return $this->getView();
 	}
 	public function removemailAction(){
 	    header('Content-Type: application/json');
 	    \Mailer\Imap::i()->selectFolder($this->getRequestData()->folder);
 	    \Mailer\Imap::i()->removeMessage($this->getRequestData()->id);
 	    echo '{"success":true}';
-	    return false;
+	    return $this->response;
 	}
 	public function movemailAction(){
 	    header('Content-Type: application/json');
@@ -131,7 +137,7 @@ class IndexController extends AbstractActionController
 	        \Mailer\Smtp::i()->sendmail(\Mailer\Config::SMTP_FROM, $contacts, $subject, $content);
 	    }
 	    echo '{"success":true}';
-		return false;
+	    return $this->response;
 	}
 	
 	protected $data;

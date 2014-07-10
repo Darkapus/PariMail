@@ -14,12 +14,18 @@ use Zend\View\Model\ViewModel;
 
 class FileController extends AbstractActionController
 {
+    private $view;
+    public function getView(){
+        if(is_null($this->view)){
+            $this->view = new ViewModel();
+        }
+        return $this->view;
+    }
     public function indexAction()
     {
         return new ViewModel();
     }
     public function downloadAction(){
-        
         \Mailer\Imap::i()->selectFolder($this->getEvent()->getRouteMatch()->getParam('folder'));
 		$formated = \Mailer\Imap::i()->getFormatedMessage($this->getEvent()->getRouteMatch()->getParam('message'));
 		
@@ -27,15 +33,16 @@ class FileController extends AbstractActionController
 		$file = $parts['file'][$this->getEvent()->getRouteMatch()->getParam('id')];
 		
 		if(!$file->getHeaders()->get('Content-Disposition') && !$file->getHeaders()->get('Content-Transfer-Encoding')){
-		    echo nl2br($file->getContent());exit;
+		    echo nl2br($file->getContent());
+		    return false;
 		}
 		header('Content-Type:'.$file->getHeaders()->get('contenttype')->getFieldValue());
 		$file->getHeaders()->get('Content-Disposition')&&header('Content-Disposition:'.$file->getHeaders()->get('Content-Disposition')->getFieldValue());
 		$file->getHeaders()->get('Content-Transfer-Encoding')&&header('Content-Transfer-Encoding:'.$file->getHeaders()->get('Content-Transfer-Encoding')->getFieldValue());
-		//header('Content-Transfer-Encoding: binary');
+		
 		echo(base64_decode($file->getContent()));
-		//var_dump($file->getHeaders());
-		return false;
+		
+		return $this->response;
     }
     protected $data;
 	public function getRequestData(){
