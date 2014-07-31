@@ -23,7 +23,43 @@ class Module
 
     public function getConfig()
     {
-        return include __DIR__ . '/Config/module.config.php';
+        return array(
+            'router' => array(
+                'routes' => array(
+                    'project' => array(
+                        'type'    => 'Segment',
+                        'options' => array(
+                            // Change this to something specific to your module
+                            'route'    => '/project[/:controller[/:action[/:id]]]',
+                        	'constraints' => array(
+                        		'controller' => '[a-zA-Z][a-zA-Z0-9_-]*',
+                        		'action' => '[a-zA-Z][a-zA-Z0-9_-]*',
+                        		'part' => '[0-9]*',
+                        	),
+                            'defaults' => array(
+                                // Change this value to reflect the namespace in which
+                                // the controllers for your module are found
+                                '__NAMESPACE__' => 'Project\Controller',
+                                'controller'    => 'index',
+                                'action'        => 'index',
+                            ),
+                        ),
+                    ),
+                ),
+            ),
+            'view_manager' => array(
+            		'template_path_stack' => array(
+            				'project' => __DIR__ . '/View',
+            		),
+            ),
+            'controllers' => array(
+                'invokables' => array(
+                    'Project\Controller\Index' => 'Project\Controller\IndexController',
+                ),
+            ),
+            
+        );
+
     }
 
     public function getAutoloaderConfig()

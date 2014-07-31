@@ -82,6 +82,7 @@ class IndexController extends AbstractActionController
 		$content = $formated->getContent();
 		$parts = $formated->getAllParts();
 		$files = array();
+		if(array_key_exists('file', $files))
 		foreach($parts['file'] as $file){
 		    if(!$file->getHeaders()->get('Content-Disposition')) {
 		        $files[] = 'mail.txt';

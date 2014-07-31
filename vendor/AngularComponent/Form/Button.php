@@ -8,8 +8,8 @@ class Button extends \AngularComponent\Core\Element
         $this->setValue( $value);
         $model  && $this->addAttribute("ng-model", $model);
         parent::__construct($id);
-        $this->addClass('btn');
-        $this->setDom('button btn-primary');
+        $this->addClass('btn btn-primary');
+        $this->setDom('button');
     }
     protected $value;
     public function setValue($value){
