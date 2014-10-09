@@ -29,7 +29,7 @@ class Imap extends \Zend\Mail\Storage\Imap{
 			$o->date    = $o->date->format('Y-m-d H:i:s');
 			$o->seen    = $mail->hasFlag('\Seen')?'read':'unread';
 			$o->objectType = 'message';
-			$contenttype = $mail->getHeaders()->get('contenttype')->getFieldValue();
+			$contenttype = $mail->getHeaders()->get('contenttype')?$mail->getHeaders()->get('contenttype')->getFieldValue():"";
 			if(substr($contenttype,0,15)=="multipart/mixed"){
 			    $o->file    = true;
 			}

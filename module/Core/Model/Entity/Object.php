@@ -329,5 +329,4 @@ abstract class Object
 		$this->save();
 		return $this;
 	}
-	
 }
