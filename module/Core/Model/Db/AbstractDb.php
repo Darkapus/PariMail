@@ -26,7 +26,7 @@ class AbstractDb{
 		AnnotationRegistry::registerLoader('class_exists');
 		$config->setMetadataDriverImpl($this->getDriver());
 		
-		if($isDevMode == false){
+		if($isDevMode === false){
     		$memcache = new \Memcache();
     		$memcache->connect('localhost', 11211);//11211);
     		$mm = new MemcacheCache();

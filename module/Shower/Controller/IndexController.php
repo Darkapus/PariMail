@@ -27,7 +27,7 @@ class IndexController extends AbstractActionController{
         $files = scandir('/var/www/Waste/public/img/shoot');
         
         echo json_encode($files);
-        exit;
+        return $this->response;
     }
     public function shootAction(){
         $files = scandir('/var/www/Waste/public/img/shoot');
@@ -36,7 +36,7 @@ class IndexController extends AbstractActionController{
         
         echo readfile($fullpath);
         
-        exit;
+       return $this->response;
     }
     protected $data;
 	public function getRequestData(){
